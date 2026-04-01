@@ -456,14 +456,16 @@
             <strong>Οδηγίες:</strong> Σε κάθε ερώτηση υπάρχει υπόδειξη και διαθέσιμες βοήθειες.
             Το <strong>50:50</strong> κοστίζει το 50% της αξίας της ερώτησης, το <strong>Κοινό</strong> κοστίζει 75%
             και η <strong>Αλλαγή Ερώτησης</strong> κοστίζει 25%. Οι ποινές αφαιρούνται αμέσως από το σκορ σου, οπότε
-            μπορείς να πέσεις και σε αρνητικό σκορ αν χρησιμοποιήσεις βοήθεια πολύ νωρίς.
+            μπορεί να πέσεις και σε αρνητικό σκορ αν χρησιμοποιήσεις βοήθεια πολύ νωρίς.
         </div>
         <input type="text" id="fname" placeholder="Όνομα">
         <input type="text" id="lname" placeholder="Επώνυμο">
         <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
         <div class="top-actions" style="margin-top:10px;">
+            <button class="secondary" onclick="openDuelMode()">Μονομαχία / Room</button>
             <button class="secondary" onclick="openLeaderboard()">Leaderboard</button>
         </div>
+        <p class="leaderboard-note">Παίξε solo ή μπες σε duel room για online μονομαχία.</p>
     </div>
 
     <div id="scr-quiz" class="hidden">
@@ -554,10 +556,11 @@
 <script src="./firebase-config.js"></script>
 <script src="./Quiz12-questions.js"></script>
 <script>
-const QUIZ_TITLE = 'Quiz 12';
+const QUIZ_TITLE = 'ultimate quiz';
 const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
 const QUESTION_TIME = 45;
+const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
 const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
 const QUESTIONS_PER_GAME = 10;
@@ -967,6 +970,10 @@ function startQuiz() {
 function openLeaderboard() {
     renderLeaderboard();
     show('scr-leaderboard');
+}
+
+function openDuelMode() {
+    window.location.href = DUEL_MODE_URL;
 }
 
 function restartQuiz() {
