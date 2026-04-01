@@ -7,7 +7,7 @@ window.FIREBASE_CONFIG = {
   appId: "1:804082374858:web:075c9e92b9a26b65597c33"
 };
 
-window.QUIZ12_ADMIN = {
+window.QUIZ_ADMIN = {
   username: "vassilis",
   password: "04091986"
 };
