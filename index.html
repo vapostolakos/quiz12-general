@@ -1981,6 +1981,7 @@ function checkAnswer(idx) {
     const q = questions[cur];
     const isCorrect = idx === q.a;
     answersStatus[cur] = { selectedIndex: idx, isCorrect };
+    const btnPrev = document.getElementById('btn-prev');
     const btns = document.querySelectorAll('.option-btn');
     btns.forEach(btn => { btn.disabled = true; btn.onclick = null; });
 
@@ -1999,6 +2000,11 @@ function checkAnswer(idx) {
 
     document.getElementById('score-display').textContent = score;
     showRationale(q.r);
+    if (btnPrev) {
+        const canGoBack = cur > 0;
+        btnPrev.disabled = !canGoBack;
+        btnPrev.classList.toggle('prev-active', canGoBack);
+    }
     document.getElementById('btn-next').disabled = false;
     document.getElementById('btn-next').classList.add('next-active');
 }
