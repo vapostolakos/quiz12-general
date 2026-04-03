@@ -954,8 +954,10 @@ const AUDIENCE_PENALTY = 0.75;
 const SWAP_PENALTY = 0.25;
 const HINT_PENALTY = 0.2;
 const AUDIENCE_PATTERN_KEY = 'quiz12_audience_pattern_count';
+const QUESTION_SEEN_IDS_KEY = 'quiz12_seen_question_ids';
 const QUESTION_HISTORY_KEY = 'quiz12_recent_question_history';
 const QUESTION_CYCLE_QUEUE_KEY = 'quiz12_question_cycle_queue';
+const QUESTION_MEMORY_RECENT_LIMIT = 40;
 
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
 let questions = [];
@@ -1477,36 +1479,6 @@ function getQuestionId(question) {
     return question?.id || question?.q || JSON.stringify(question);
 }
 
-function getQuestionHistory() {
-    try {
-        const raw = JSON.parse(localStorage.getItem(QUESTION_HISTORY_KEY) || '[]');
-        return Array.isArray(raw) ? raw : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveQuestionHistory(history) {
-    try {
-        localStorage.setItem(QUESTION_HISTORY_KEY, JSON.stringify(history));
-    } catch {}
-}
-
-function getQuestionCycleQueue() {
-    try {
-        const raw = JSON.parse(localStorage.getItem(QUESTION_CYCLE_QUEUE_KEY) || '[]');
-        return Array.isArray(raw) ? raw : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveQuestionCycleQueue(queue) {
-    try {
-        localStorage.setItem(QUESTION_CYCLE_QUEUE_KEY, JSON.stringify(queue));
-    } catch {}
-}
-
 function getUniqueQuestionMap() {
     const questionMap = new Map();
     QUESTION_POOL.forEach(question => {
@@ -1518,63 +1490,163 @@ function getUniqueQuestionMap() {
     return questionMap;
 }
 
-function initializeQuestionSet() {
-    const questionMap = getUniqueQuestionMap();
+function getGuestQuestionMemory() {
+    try {
+        const seenRaw = JSON.parse(localStorage.getItem(QUESTION_SEEN_IDS_KEY) || '[]');
+        const recentRaw = JSON.parse(localStorage.getItem(QUESTION_HISTORY_KEY) || '[]');
+        return {
+            seenIds: Array.isArray(seenRaw) ? seenRaw : [],
+            recentIds: Array.isArray(recentRaw) ? recentRaw : []
+        };
+    } catch {
+        return { seenIds: [], recentIds: [] };
+    }
+}
+
+function saveGuestQuestionMemory(seenIds, recentIds) {
+    try {
+        localStorage.setItem(QUESTION_SEEN_IDS_KEY, JSON.stringify(seenIds));
+        localStorage.setItem(QUESTION_HISTORY_KEY, JSON.stringify(recentIds));
+        localStorage.removeItem(QUESTION_CYCLE_QUEUE_KEY);
+    } catch {}
+}
+
+function getPlayerQuestionMemory() {
+    if (currentAuthProfile) {
+        return {
+            seenIds: Array.isArray(currentAuthProfile.seenQuestionIds) ? currentAuthProfile.seenQuestionIds : [],
+            recentIds: Array.isArray(currentAuthProfile.recentQuestionIds) ? currentAuthProfile.recentQuestionIds : []
+        };
+    }
+    return getGuestQuestionMemory();
+}
+
+function normalizeQuestionIdList(ids, questionMap) {
+    if (!Array.isArray(ids)) return [];
+    const seen = new Set();
+    return ids.filter(id => {
+        if (!questionMap.has(id) || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+    });
+}
+
+function mergeQuestionIds(baseIds, appendIds, limit) {
+    const seen = new Set();
+    const merged = [];
+    [...baseIds, ...appendIds].forEach(id => {
+        if (seen.has(id)) return;
+        seen.add(id);
+        merged.push(id);
+    });
+    return Number.isFinite(limit) ? merged.slice(-limit) : merged;
+}
+
+async function persistQuestionMemory(seenIds, recentIds) {
+    const nextSeenIds = [...seenIds];
+    const nextRecentIds = [...recentIds];
+
+    if (currentAuthProfile && currentAuthUser && firebaseReady && firebaseApi && firebaseDb) {
+        currentAuthProfile = {
+            ...currentAuthProfile,
+            seenQuestionIds: nextSeenIds,
+            recentQuestionIds: nextRecentIds
+        };
+        try {
+            await firebaseApi.setDoc(
+                firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid),
+                {
+                    seenQuestionIds: nextSeenIds,
+                    recentQuestionIds: nextRecentIds,
+                    updatedAt: new Date().toISOString()
+                },
+                { merge: true }
+            );
+        } catch {}
+        return;
+    }
+
+    saveGuestQuestionMemory(nextSeenIds, nextRecentIds);
+}
+
+function buildQuestionSelection(questionMap, count) {
     const allIds = Array.from(questionMap.keys());
-    let queue = getQuestionCycleQueue().filter(id => questionMap.has(id));
-    const imageIds = new Set(allIds.filter(id => {
+    const memory = getPlayerQuestionMemory();
+    const validRecentIds = normalizeQuestionIdList(memory.recentIds, questionMap);
+    let validSeenIds = normalizeQuestionIdList(memory.seenIds, questionMap);
+
+    if (allIds.length && validSeenIds.length >= allIds.length) {
+        validSeenIds = validRecentIds.slice(-Math.max(count * 3, QUESTION_MEMORY_RECENT_LIMIT));
+    }
+
+    const seenSet = new Set(validSeenIds);
+    const recentSet = new Set(validRecentIds);
+    const unseenIds = allIds.filter(id => !seenSet.has(id));
+    const revisitableIds = allIds.filter(id => seenSet.has(id) && !recentSet.has(id));
+    const recentOnlyIds = allIds.filter(id => recentSet.has(id));
+    const imageSet = new Set(allIds.filter(id => {
         const question = questionMap.get(id);
         return !!(question?.img && String(question.img).trim());
     }));
 
-    if (!queue.length) {
-        queue = shuffleArray(allIds);
-    }
-
-    const selectedIds = [];
     const targetImageCount = Math.min(
-        Math.max(2, Math.ceil(QUESTIONS_PER_GAME * 0.3)),
-        QUESTIONS_PER_GAME,
-        imageIds.size
+        Math.max(2, Math.ceil(count * 0.3)),
+        count,
+        imageSet.size
     );
 
-    function pullIds(limit, predicate = null) {
-        while (selectedIds.length < limit && questionMap.size) {
-            if (!queue.length) {
-                const refillIds = allIds.filter(id => !selectedIds.includes(id));
-                if (!refillIds.length) break;
-                queue = shuffleArray(refillIds);
-            }
+    const selectedIds = [];
+    let selectedImageCount = 0;
 
-            const nextId = queue.shift();
-            if (!nextId || selectedIds.includes(nextId)) continue;
-
-            if (predicate && !predicate(nextId)) {
-                queue.push(nextId);
-                const remainingMatches = queue.some(predicate);
-                if (!remainingMatches) break;
-                continue;
-            }
-
-            selectedIds.push(nextId);
+    function addFrom(sourceIds, requireImage = false) {
+        for (const id of sourceIds) {
+            if (selectedIds.length >= count) break;
+            if (selectedIds.includes(id)) continue;
+            const isImage = imageSet.has(id);
+            if (requireImage && !isImage) continue;
+            selectedIds.push(id);
+            if (isImage) selectedImageCount += 1;
         }
     }
 
-    pullIds(targetImageCount, id => imageIds.has(id));
-    pullIds(QUESTIONS_PER_GAME);
+    addFrom(shuffleArray(unseenIds), true);
+    if (selectedImageCount < targetImageCount) {
+        addFrom(shuffleArray(revisitableIds), true);
+    }
+    if (selectedImageCount < targetImageCount) {
+        addFrom(shuffleArray(recentOnlyIds), true);
+    }
+
+    addFrom(shuffleArray(unseenIds));
+    addFrom(shuffleArray(revisitableIds));
+    addFrom(shuffleArray(recentOnlyIds));
+
+    const updatedSeenIds = mergeQuestionIds(validSeenIds, selectedIds, allIds.length);
+    const updatedRecentIds = mergeQuestionIds(
+        validRecentIds.filter(id => !selectedIds.includes(id)),
+        selectedIds,
+        Math.max(count * 4, QUESTION_MEMORY_RECENT_LIMIT)
+    );
+
+    return { selectedIds, updatedSeenIds, updatedRecentIds };
+}
+
+function initializeQuestionSet() {
+    const questionMap = getUniqueQuestionMap();
+    const allIds = Array.from(questionMap.keys());
+    const { selectedIds, updatedSeenIds, updatedRecentIds } = buildQuestionSelection(questionMap, QUESTIONS_PER_GAME);
 
     questions = selectedIds
         .map(id => questionMap.get(id))
         .filter(Boolean)
         .map(shuffleQuestionOptions);
 
-    reserveQuestions = queue
+    reserveQuestions = shuffleArray(allIds.filter(id => !selectedIds.includes(id)))
         .map(id => questionMap.get(id))
         .filter(Boolean)
         .map(shuffleQuestionOptions);
 
-    saveQuestionCycleQueue(queue);
-    saveQuestionHistory(selectedIds.slice(-Math.max(QUESTIONS_PER_GAME, 20)));
+    persistQuestionMemory(updatedSeenIds, updatedRecentIds);
 }
 
 function getCurrentQuestionPoints() {
