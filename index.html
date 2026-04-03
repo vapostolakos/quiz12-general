@@ -25,67 +25,41 @@
             justify-content: center;
             align-items: center;
             background:
-                radial-gradient(circle at top, rgba(14,165,233,0.18), transparent 30%),
-                linear-gradient(180deg, #020617 0%, #0f172a 60%, #111827 100%);
+                linear-gradient(180deg, rgba(2, 6, 23, 0.72), rgba(15, 23, 42, 0.84)),
+                radial-gradient(circle at center, rgba(245, 158, 11, 0.14), transparent 42%),
+                url("./Quiz%20Nights-Logo.png") center center / cover no-repeat fixed;
             color: var(--text);
             padding: 1rem;
             position: relative;
             overflow-x: hidden;
         }
         body::before {
-            content: "?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0QUIZ\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0CARD\00a0?\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0SCORE\00a0?\00a0?";
+            content: "";
             position: fixed;
             inset: 0;
-            font-size: clamp(4.4rem, 9.6vw, 7.8rem);
-            line-height: 1.02;
-            letter-spacing: 1.3rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-weight: 900;
             background:
-                radial-gradient(circle at 10% 18%, rgba(255,255,255,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 30% 76%, rgba(245,158,11,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 68% 24%, rgba(34,197,94,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 88% 70%, rgba(14,165,233,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 52% 52%, rgba(255,255,255,0.15) 0 8%, transparent 9%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow:
-                0 0 10px rgba(255, 255, 255, 0.05),
-                0 0 24px rgba(255, 255, 255, 0.02);
+                radial-gradient(circle at center, rgba(255, 214, 144, 0.12), transparent 32%),
+                linear-gradient(180deg, rgba(2, 6, 23, 0.25), rgba(2, 6, 23, 0.72));
             z-index: 0;
             pointer-events: none;
-            transform: rotate(-11deg) scale(1.12) translate(-1%, -3%);
-            opacity: 1;
+            backdrop-filter: blur(2px);
         }
         body::after {
-            content: "Quiz K-nights";
+            content: "";
             position: fixed;
-            top: 3.5vh;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            font-size: clamp(2.8rem, 6.4vw, 5.4rem);
-            font-weight: 900;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(245, 158, 11, 0.26);
-            text-shadow:
-                0 0 10px rgba(245, 158, 11, 0.16),
-                0 10px 30px rgba(0, 0, 0, 0.28);
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(245, 158, 11, 0.08), transparent 48%);
             z-index: 0;
             pointer-events: none;
-            transform: none;
         }
         .container {
             width: min(100%, 720px);
-            background: rgba(30, 41, 59, 0.96);
-            border: 1px solid var(--border);
+            background: rgba(8, 15, 28, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.22);
             border-radius: 24px;
             padding: 1.5rem;
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(10px);
             position: relative;
             z-index: 1;
         }
@@ -119,6 +93,173 @@
         }
         .intro-guide strong {
             color: var(--accent);
+        }
+        .review-entry {
+            margin-top: 1rem;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(15, 23, 42, 0.82);
+            display: grid;
+            gap: 12px;
+        }
+        .review-entry-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+        .review-entry-title {
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 1rem;
+        }
+        .review-entry-copy {
+            color: #cbd5e1;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+        .review-open-btn {
+            max-width: 220px;
+            justify-self: start;
+            background: linear-gradient(135deg, #f59e0b, #fb7185);
+            box-shadow: 0 14px 28px rgba(245, 158, 11, 0.22);
+        }
+        .review-layout {
+            display: grid;
+            gap: 14px;
+        }
+        .review-card {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            display: grid;
+            gap: 12px;
+        }
+        .review-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .review-summary-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+        .review-summary-card strong {
+            display: block;
+            color: var(--accent);
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+        .review-summary-card span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .star-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .star-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            background: rgba(30, 41, 59, 0.84);
+            color: rgba(245, 158, 11, 0.45);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .star-btn:hover,
+        .star-btn.active {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.8);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.18);
+            transform: translateY(-1px);
+        }
+        .review-helper {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .review-card textarea {
+            width: 100%;
+            min-height: 130px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+            color: var(--text);
+            padding: 12px 14px;
+            resize: vertical;
+            font: inherit;
+        }
+        .review-card textarea::placeholder {
+            color: #64748b;
+        }
+        .review-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .review-status {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+        .review-list {
+            display: grid;
+            gap: 10px;
+        }
+        .review-item {
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: rgba(15, 23, 42, 0.78);
+        }
+        .review-item-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .review-item-author {
+            color: var(--text);
+            font-weight: 700;
+        }
+        .review-item-date {
+            color: var(--muted);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .review-item-stars {
+            color: #fbbf24;
+            letter-spacing: 0.08em;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        .review-item-text,
+        .review-item-suggestion {
+            color: #cbd5e1;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+        .review-item-suggestion strong {
+            color: var(--accent);
+        }
+        .review-empty {
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.6;
+            padding: 8px 0;
         }
         .login-auth-panel {
             position: fixed;
@@ -761,6 +902,24 @@
                 line-height: 1.15;
             }
             .summary-grid { grid-template-columns: 1fr; }
+            .review-summary {
+                grid-template-columns: 1fr;
+            }
+            .review-entry-header,
+            .review-actions {
+                flex-direction: column;
+            }
+            .review-open-btn {
+                max-width: none;
+                justify-self: stretch;
+            }
+            .star-picker {
+                gap: 8px;
+            }
+            .star-btn {
+                width: 46px;
+                height: 46px;
+            }
         }
     </style>
 </head>
@@ -819,8 +978,56 @@
         <div class="top-actions" style="margin-top:10px;">
             <button class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
             <button class="secondary" onclick="openLeaderboard()">Leaderboard</button>
+            <button class="secondary" onclick="openReviews()">Reviews</button>
+        </div>
+        <div class="review-entry">
+            <div class="review-entry-header">
+                <div>
+                    <div class="review-entry-title">Βαθμολόγησε το Quiz Nights</div>
+                    <div class="review-entry-copy">Δώσε από 1 έως 5 αστέρια και γράψε τι αλλαγές ή βελτιώσεις θα ήθελες να δεις. Το feedback σου μας βοηθά να κάνουμε το παιχνίδι πιο elegant και πιο δυνατό.</div>
+                </div>
+            </div>
+            <button class="review-open-btn" onclick="openReviews()">Άνοιγμα αξιολόγησης</button>
         </div>
         <p class="leaderboard-note">Παίξε solo ή μπες σε room για online μονομαχία.</p>
+    </div>
+
+    <div id="scr-reviews" class="hidden">
+        <h1>Reviews</h1>
+        <p class="sub">Βαθμολόγησε το quiz και πες μας τι θα ήθελες να αλλάξει.</p>
+        <div class="review-layout">
+            <div class="review-card">
+                <div class="review-summary">
+                    <div class="review-summary-card"><strong id="review-average">-</strong><span>Μέσος Όρος</span></div>
+                    <div class="review-summary-card"><strong id="review-total">0</strong><span>Σύνολο Reviews</span></div>
+                    <div class="review-summary-card"><strong id="review-last">-</strong><span>Τελευταίο Review</span></div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-helper">Διάλεξε αστέρια και γράψε ελεύθερα γνώμη, παρατηρήσεις ή αλλαγές που θα ήθελες στο παιχνίδι.</div>
+                <div id="review-star-picker" class="star-picker">
+                    <button type="button" class="star-btn" data-value="1" onclick="setReviewRating(1)">★</button>
+                    <button type="button" class="star-btn" data-value="2" onclick="setReviewRating(2)">★</button>
+                    <button type="button" class="star-btn" data-value="3" onclick="setReviewRating(3)">★</button>
+                    <button type="button" class="star-btn" data-value="4" onclick="setReviewRating(4)">★</button>
+                    <button type="button" class="star-btn" data-value="5" onclick="setReviewRating(5)">★</button>
+                </div>
+                <div id="review-rating-label" class="review-helper">Δεν έχεις διαλέξει ακόμη βαθμολογία.</div>
+                <textarea id="review-comment" placeholder="Τι σου άρεσε ή τι σε δυσκόλεψε στο quiz;"></textarea>
+                <textarea id="review-suggestion" placeholder="Τι αλλαγές, προσθήκες ή βελτιώσεις θα ήθελες να γίνουν;"></textarea>
+                <div class="review-actions">
+                    <button onclick="submitReview()">Υποβολή Review</button>
+                    <button class="secondary" onclick="show('scr-login')">Επιστροφή</button>
+                </div>
+                <div id="review-status" class="review-status">Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.</div>
+            </div>
+            <div class="review-card">
+                <h2 style="text-align:center; color: var(--accent); font-size: 1.05rem;">Πρόσφατα σχόλια</h2>
+                <div id="review-list" class="review-list">
+                    <div class="review-empty">Δεν υπάρχουν reviews ακόμα.</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="scr-quiz" class="hidden">
@@ -919,6 +1126,7 @@ const QUIZ_TITLE = 'ultimate quiz';
 const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
 const PROFILE_COLLECTION = 'quiz12_duel_profiles';
+const REVIEW_COLLECTION = 'quiz12_reviews';
 const QUESTION_TIME = 45;
 const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
@@ -990,7 +1198,8 @@ const QUESTION_IMAGE_ALIASES = {
 };
 
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
-let questions = [];
+const REVIEW_STORAGE_KEY = 'quiz12_reviews_local';
+  let questions = [];
 let reserveQuestions = [];
 let user = { f: "", l: "", id: "" };
 let cur = 0, score = 0, correct = 0;
@@ -1006,10 +1215,12 @@ let firebaseApi = null;
 let firebaseAuth = null;
 let authApi = null;
 let currentAuthUser = null;
-let currentAuthProfile = null;
-let mainProfileEditorOpen = false;
-let selectedEntryId = null;
-let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
+  let currentAuthProfile = null;
+  let mainProfileEditorOpen = false;
+  let selectedEntryId = null;
+  let reviewRating = 0;
+  let reviewEntriesCache = [];
+  let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
 let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
@@ -1816,6 +2027,178 @@ function formatDate(ts) {
     });
 }
 
+function getReviewDisplayName() {
+    if (currentAuthProfile?.nickname) return currentAuthProfile.nickname;
+    const fullName = `${currentAuthProfile?.firstName || ''} ${currentAuthProfile?.lastName || ''}`.trim();
+    if (fullName) return fullName;
+    const manualName = `${document.getElementById('fname')?.value || ''} ${document.getElementById('lname')?.value || ''}`.trim();
+    return manualName || 'Guest Player';
+}
+
+function getLocalReviews() {
+    try {
+        const raw = JSON.parse(localStorage.getItem(REVIEW_STORAGE_KEY) || '[]');
+        return Array.isArray(raw) ? raw : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveLocalReviews(entries) {
+    try {
+        localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(entries));
+    } catch {}
+}
+
+function normalizeReviewEntry(entry) {
+    return {
+        id: entry.id || createAttemptId(),
+        rating: Math.max(1, Math.min(5, Number(entry.rating || 0))) || 0,
+        comment: String(entry.comment || '').trim(),
+        suggestion: String(entry.suggestion || '').trim(),
+        authorName: String(entry.author_name || entry.authorName || 'Guest Player').trim() || 'Guest Player',
+        authUid: String(entry.auth_uid || entry.authUid || '').trim(),
+        createdAt: entry.created_at || entry.createdAt || new Date().toISOString()
+    };
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function renderReviewStars(rating) {
+    const safeRating = Math.max(0, Math.min(5, Number(rating || 0)));
+    return '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
+}
+
+function updateReviewSummary(entries) {
+    const total = entries.length;
+    const average = total ? (entries.reduce((sum, item) => sum + Number(item.rating || 0), 0) / total).toFixed(1) : '-';
+    const latest = total ? formatDate(entries[0].createdAt) : '-';
+    document.getElementById('review-average').textContent = average;
+    document.getElementById('review-total').textContent = String(total);
+    document.getElementById('review-last').textContent = latest;
+}
+
+function renderReviewList(entries) {
+    const listEl = document.getElementById('review-list');
+    if (!listEl) return;
+    if (!entries.length) {
+        listEl.innerHTML = '<div class="review-empty">Δεν υπάρχουν reviews ακόμα.</div>';
+        updateReviewSummary([]);
+        return;
+    }
+
+    listEl.innerHTML = entries.slice(0, 8).map(entry => `
+        <div class="review-item">
+            <div class="review-item-head">
+                <div class="review-item-author">${escapeHtml(entry.authorName)}</div>
+                <div class="review-item-date">${formatDate(entry.createdAt)}</div>
+            </div>
+            <div class="review-item-stars">${renderReviewStars(entry.rating)}</div>
+            <div class="review-item-text">${escapeHtml(entry.comment || 'Χωρίς επιπλέον σχόλιο.')}</div>
+            ${entry.suggestion ? `<div class="review-item-suggestion" style="margin-top:8px;"><strong>Θα ήθελα να αλλάξει:</strong> ${escapeHtml(entry.suggestion)}</div>` : ''}
+        </div>
+    `).join('');
+    updateReviewSummary(entries);
+}
+
+async function fetchReviews() {
+    if (firebaseReady) {
+        const snapshot = await firebaseApi.getDocs(firebaseApi.collection(firebaseDb, REVIEW_COLLECTION));
+        reviewEntriesCache = snapshot.docs
+            .map(doc => normalizeReviewEntry({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+        reviewEntriesCache = getLocalReviews()
+            .map(normalizeReviewEntry)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    renderReviewList(reviewEntriesCache);
+    return reviewEntriesCache;
+}
+
+function setReviewRatingLabel() {
+    const label = document.getElementById('review-rating-label');
+    if (!label) return;
+    const copy = [
+        '',
+        '1 αστέρι: Χρειάζεται πολλή δουλειά.',
+        '2 αστέρια: Υπάρχει βάση αλλά θέλει βελτίωση.',
+        '3 αστέρια: Καλό, με περιθώριο για upgrade.',
+        '4 αστέρια: Πολύ δυνατό quiz.',
+        '5 αστέρια: Εξαιρετικό, premium εμπειρία.'
+    ];
+    label.textContent = reviewRating ? copy[reviewRating] : 'Δεν έχεις διαλέξει ακόμη βαθμολογία.';
+}
+
+window.setReviewRating = function setReviewRating(value) {
+    reviewRating = Number(value || 0);
+    document.querySelectorAll('#review-star-picker .star-btn').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.value) <= reviewRating);
+    });
+    setReviewRatingLabel();
+};
+
+function resetReviewForm() {
+    reviewRating = 0;
+    document.getElementById('review-comment').value = '';
+    document.getElementById('review-suggestion').value = '';
+    document.getElementById('review-status').textContent = 'Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.';
+    window.setReviewRating(0);
+}
+
+window.openReviews = async function openReviews() {
+    show('scr-reviews');
+    await fetchReviews();
+};
+
+window.submitReview = async function submitReview() {
+    const statusEl = document.getElementById('review-status');
+    const comment = document.getElementById('review-comment').value.trim();
+    const suggestion = document.getElementById('review-suggestion').value.trim();
+
+    if (!reviewRating) {
+        statusEl.textContent = 'Διάλεξε πρώτα από 1 έως 5 αστέρια.';
+        return;
+    }
+
+    if (!comment && !suggestion) {
+        statusEl.textContent = 'Γράψε είτε ένα σχόλιο είτε μια πρόταση αλλαγής.';
+        return;
+    }
+
+    const payload = {
+        id: createAttemptId(),
+        rating: reviewRating,
+        comment,
+        suggestion,
+        author_name: getReviewDisplayName(),
+        auth_uid: currentAuthUser?.uid || '',
+        created_at: new Date().toISOString()
+    };
+
+    try {
+        if (firebaseReady) {
+            await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, REVIEW_COLLECTION, payload.id), payload);
+        } else {
+            const next = [payload, ...getLocalReviews()].slice(0, 60);
+            saveLocalReviews(next);
+        }
+        resetReviewForm();
+        statusEl.textContent = 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.';
+        await fetchReviews();
+    } catch (error) {
+        statusEl.textContent = `Δεν αποθηκεύτηκε το review: ${error.message}`;
+    }
+};
+
 function normalizeRemoteEntries(entries) {
     return entries.map(entry => {
         const totalCorrect = Number(entry.total_correct || 0);
@@ -2027,7 +2410,7 @@ function resolveQuestionImagePath(imgPath) {
 }
 
 function show(id) {
-    ['scr-login', 'scr-quiz', 'scr-end', 'scr-leaderboard'].forEach(s => {
+    ['scr-login', 'scr-reviews', 'scr-quiz', 'scr-end', 'scr-leaderboard'].forEach(s => {
         document.getElementById(s).classList.toggle('hidden', s !== id);
     });
 }
@@ -2413,6 +2796,7 @@ async function endQuiz() {
 document.title = QUIZ_TITLE;
 document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
 updateAudioButtons();
+resetReviewForm();
 initFirebaseLeaderboard().finally(async () => {
     if (authApi && firebaseAuth) {
         try {
@@ -2422,6 +2806,7 @@ initFirebaseLeaderboard().finally(async () => {
         }
     }
     updateMainAuthUi();
+    fetchReviews();
     renderLeaderboard();
 });
 </script>
