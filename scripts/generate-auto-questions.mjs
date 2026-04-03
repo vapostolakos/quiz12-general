@@ -2,15 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const bankPath = path.join(root, 'automation-data', 'auto-country-bank.json');
 const generalBankPath = path.join(root, 'automation-data', 'auto-general-bank.json');
 const statePath = path.join(root, 'automation-data', 'question-generator-state.json');
 const outputPath = path.join(root, 'Quiz12-auto-questions.js');
+const userImageRoot = path.join(root, 'assets', 'images', 'questions');
 
-const RUN_ENTRY_COUNT = 12;
 const RUN_GENERAL_COUNT = 12;
 
-const bank = JSON.parse(fs.readFileSync(bankPath, 'utf8'));
 const generalBank = JSON.parse(fs.readFileSync(generalBankPath, 'utf8'));
 const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 
@@ -20,51 +18,37 @@ function rotate(array, offset) {
   return array.slice(safeOffset).concat(array.slice(0, safeOffset));
 }
 
-function makeDistractors(entry, field) {
-  const sameRegion = bank.filter(item => item.region === entry.region && item[field] !== entry[field]);
-  const fallback = sameRegion.length >= 3 ? sameRegion : bank.filter(item => item[field] !== entry[field]);
-  const seed = entry.code.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0) + field.length;
-  const ordered = rotate(fallback, seed);
-  return ordered.slice(0, 3).map(item => item[field]);
+function listImageAssetNames(dirPath) {
+  if (!fs.existsSync(dirPath)) return [];
+  return fs.readdirSync(dirPath, { withFileTypes: true }).flatMap(entry => {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      return listImageAssetNames(fullPath);
+    }
+    return [path.relative(userImageRoot, fullPath).replace(/\\/g, '/')];
+  });
 }
 
-function makeOptions(correct, distractors) {
-  const options = [correct, ...distractors];
-  for (let i = options.length - 1; i > 0; i -= 1) {
-    const j = (correct.length + i) % (i + 1);
-    [options[i], options[j]] = [options[j], options[i]];
+function readPreviousAutoQuestions() {
+  if (!fs.existsSync(outputPath)) return [];
+  const fileContents = fs.readFileSync(outputPath, 'utf8');
+  const match = fileContents.match(/window\.QUIZ12_AUTO_QUESTIONS\s*=\s*(.*);\s*$/s);
+  if (!match?.[1]) return [];
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return [];
   }
-  return { options, answerIndex: options.indexOf(correct) };
 }
 
-const selection = rotate(bank, state.offset).slice(0, Math.min(RUN_ENTRY_COUNT, bank.length));
+const currentAssetSignature = listImageAssetNames(userImageRoot).sort().join('|');
+const previousAutoQuestions = readPreviousAutoQuestions();
+const preservedImageQuestions = currentAssetSignature === (state.assetImageSignature || '')
+  ? previousAutoQuestions.filter(item => item?.img)
+  : [];
+
 const generalSelection = rotate(generalBank, state.generalOffset || 0).slice(0, Math.min(RUN_GENERAL_COUNT, generalBank.length));
-
-const generatedQuestions = [];
-for (const entry of selection) {
-  const flagUrl = `https://flagcdn.com/${entry.code}.svg`;
-  const countryOptions = makeOptions(entry.country, makeDistractors(entry, 'country'));
-  generatedQuestions.push({
-    id: `auto-flag-country-${entry.code}`,
-    q: `Ποια δύσκολη χώρα ή επικράτεια αντιστοιχεί στη σημαία της εικόνας;`,
-    o: countryOptions.options,
-    a: countryOptions.answerIndex,
-    h: `Η σωστή απάντηση ανήκει στη γεωγραφική περιοχή ${entry.region}.`,
-    r: `Η σημαία της εικόνας ανήκει στην ${entry.country}.`,
-    img: flagUrl
-  });
-
-  const capitalOptions = makeOptions(entry.capital, makeDistractors(entry, 'capital'));
-  generatedQuestions.push({
-    id: `auto-flag-capital-${entry.code}`,
-    q: `Ποια είναι η πρωτεύουσα της χώρας ή επικράτειας που δείχνει η σημαία;`,
-    o: capitalOptions.options,
-    a: capitalOptions.answerIndex,
-    h: `Η σημαία της εικόνας ανήκει στην ${entry.country}.`,
-    r: `Η σημαία ανήκει στην ${entry.country} και πρωτεύουσά της είναι η ${entry.capital}.`,
-    img: flagUrl
-  });
-}
+const generatedQuestions = [...preservedImageQuestions];
 
 for (const entry of generalSelection) {
   generatedQuestions.push({
@@ -81,8 +65,8 @@ for (const entry of generalSelection) {
 const fileBody = `window.QUIZ12_AUTO_QUESTIONS = ${JSON.stringify(generatedQuestions, null, 2)};\n`;
 fs.writeFileSync(outputPath, fileBody, 'utf8');
 
-state.offset = (state.offset + RUN_ENTRY_COUNT) % bank.length;
 state.generalOffset = ((state.generalOffset || 0) + RUN_GENERAL_COUNT) % generalBank.length;
+state.assetImageSignature = currentAssetSignature;
 state.lastGeneratedAt = new Date().toISOString();
 fs.writeFileSync(statePath, JSON.stringify(state, null, 2) + '\n', 'utf8');
 

@@ -958,6 +958,36 @@ const QUESTION_SEEN_IDS_KEY = 'quiz12_seen_question_ids';
 const QUESTION_HISTORY_KEY = 'quiz12_recent_question_history';
 const QUESTION_CYCLE_QUEUE_KEY = 'quiz12_question_cycle_queue';
 const QUESTION_MEMORY_RECENT_LIMIT = 40;
+const QUESTION_IMAGE_ALIASES = {
+    'assets/images/questions/flags/japan.svg': 'assets/images/questions/flags/Flag_of_Japan.svg.png',
+    'assets/images/questions/flags/france.svg': 'assets/images/questions/flags/download.jpg',
+    'assets/images/questions/flags/italy.svg': 'assets/images/questions/flags/italy-flag-wallpaper_1024x1024.jpg',
+    'assets/images/questions/flags/germany.svg': 'assets/images/questions/flags/Flag_of_Germany.svg.webp',
+    'assets/images/questions/flags/greece.svg': 'assets/images/questions/flags/Flag-Greece.webp',
+    'assets/images/questions/flags/brazil.svg': 'assets/images/questions/flags/brazilian-flag-waving-stockcake.webp',
+    'assets/images/questions/maps/australia-map.svg': 'assets/images/questions/maps/australia-map.jpg',
+    'assets/images/questions/maps/india-map.svg': 'assets/images/questions/maps/india-map.webp',
+    'assets/images/questions/maps/uk-map.svg': 'assets/images/questions/maps/uk-map.webp',
+    'assets/images/questions/maps/brazil-map.svg': 'assets/images/questions/maps/brazil-map.jpg',
+    'assets/images/questions/maps/argentina-map.svg': 'assets/images/questions/maps/argentina-map.png',
+    'assets/images/questions/maps/madagascar-map.svg': 'assets/images/questions/maps/madagascar-map.png',
+    'assets/images/questions/cartoons/sponge-face.svg': 'assets/images/questions/cartoons/sponge.webp',
+    'assets/images/questions/cartoons/blue-hedgehog.svg': 'assets/images/questions/cartoons/Sonic.webp',
+    'assets/images/questions/cartoons/yellow-mouse.svg': 'assets/images/questions/cartoons/Pikachu.png',
+    'assets/images/questions/heroes/bat-emblem.svg': 'assets/images/questions/heroes/bat-emblem.jpg',
+    'assets/images/questions/heroes/spider-emblem.svg': 'assets/images/questions/heroes/spider-emblem.jpg',
+    'assets/images/questions/heroes/shield-star.svg': 'assets/images/questions/heroes/Captain_America_Shield.webp',
+    'assets/images/questions/heroes/hammer-icon.svg': 'assets/images/questions/heroes/hammer-icon.jpg',
+    'assets/images/questions/heroes/lantern-ring.svg': 'assets/images/questions/heroes/lantern-ring.jpg',
+    'assets/images/questions/animals/lion.svg': 'assets/images/questions/animals/lion.jpg',
+    'assets/images/questions/animals/elephant.svg': 'assets/images/questions/animals/elephant.jpg',
+    'assets/images/questions/animals/penguin.svg': 'assets/images/questions/animals/penguin.jpeg',
+    'assets/images/questions/animals/owl.svg': 'assets/images/questions/animals/owl.jpg',
+    'assets/images/questions/animals/octopus.svg': 'assets/images/questions/animals/Octopus.webp',
+    'assets/images/questions/animals/giraffe.svg': 'assets/images/questions/animals/giraffe.jpg',
+    'assets/images/questions/animals/shark.svg': 'assets/images/questions/animals/shark.jpg',
+    'assets/images/questions/animals/panda.svg': 'assets/images/questions/animals/panda.jpg'
+};
 
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
 let questions = [];
@@ -1993,7 +2023,7 @@ function updateHintUi(question) {
 function resolveQuestionImagePath(imgPath) {
     if (!imgPath) return '';
     if (/^(https?:|data:|blob:|\/)/i.test(imgPath)) return imgPath;
-    return imgPath;
+    return QUESTION_IMAGE_ALIASES[imgPath] || imgPath;
 }
 
 function show(id) {
