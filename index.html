@@ -395,8 +395,25 @@
         }
         .lifeline-container {
             margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .lifeline-btn {
+            width: 96px;
+            height: 96px;
+            border-radius: 999px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.18;
+            font-size: 0.88rem;
+            font-weight: 800;
+            white-space: normal;
         }
         .quiz-header {
             display: flex;
@@ -798,9 +815,9 @@
         <h2 id="q-text"></h2>
         <div id="options-box"></div>
         <div class="lifeline-container">
-            <button id="btn-5050" class="secondary" onclick="use5050()">50:50 (-50%)</button>
-            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό (-75%)</button>
-            <button id="btn-swap" class="secondary" onclick="useSwapQuestion()">Αλλαγή (-25%)</button>
+            <button id="btn-5050" class="secondary lifeline-btn" onclick="use5050()">50:50<br>(-50%)</button>
+            <button id="btn-audience" class="secondary lifeline-btn" onclick="useAudience()">Κοινό<br>(-75%)</button>
+            <button id="btn-swap" class="secondary lifeline-btn" onclick="useSwapQuestion()">Αλλαγή<br>(-25%)</button>
         </div>
         <div id="rationale-box" class="hidden"></div>
 
