@@ -994,6 +994,10 @@
                 padding: 0 1rem;
                 z-index: 1;
             }
+            #main-auth-mobile-anchor {
+                display: block !important;
+                margin-bottom: 1rem;
+            }
             .auth-mini-actions {
                 grid-template-columns: 1fr;
             }
@@ -1049,6 +1053,9 @@
             body.login-screen-active .login-auth-panel-shell {
                 display: block !important;
             }
+            #main-auth-mobile-anchor {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -1094,6 +1101,7 @@
 <div class="container">
 
     <div id="scr-login">
+        <div id="main-auth-mobile-anchor" class="hidden"></div>
         <h1>Quiz 12 - General</h1>
         <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
         <div class="intro-guide">
@@ -2636,6 +2644,21 @@ function show(id) {
     }
 }
 
+function syncMainAuthPanelLayout() {
+    const panel = document.querySelector('.login-auth-panel');
+    const desktopShell = document.getElementById('main-auth-panel-shell');
+    const mobileAnchor = document.getElementById('main-auth-mobile-anchor');
+    if (!panel || !desktopShell || !mobileAnchor) return;
+
+    if (window.innerWidth <= 640) {
+        if (panel.parentElement !== mobileAnchor) {
+            mobileAnchor.appendChild(panel);
+        }
+    } else if (panel.parentElement !== desktopShell) {
+        desktopShell.appendChild(panel);
+    }
+}
+
 function updateTimerDisplay() {
     const t = Math.ceil(timeLeft);
     document.getElementById('timer-bar').style.width = (timeLeft / QUESTION_TIME * 100) + '%';
@@ -3029,6 +3052,8 @@ async function endQuiz() {
 document.title = QUIZ_TITLE;
 document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
 document.body.classList.add('login-screen-active');
+syncMainAuthPanelLayout();
+window.addEventListener('resize', syncMainAuthPanelLayout);
 updateAudioButtons();
 resetReviewForm();
 initFirebaseLeaderboard().finally(async () => {
