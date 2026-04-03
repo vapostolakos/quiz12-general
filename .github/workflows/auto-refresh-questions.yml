@@ -1,0 +1,33 @@
+name: Auto Refresh Questions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-auto-questions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate auto questions
+        run: node ./scripts/generate-auto-questions.mjs
+
+      - name: Commit updated auto questions
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Quiz12-auto-questions.js automation-data/question-generator-state.json
+          git diff --cached --quiet || git commit -m "chore: refresh auto-generated quiz questions"
+          git push
