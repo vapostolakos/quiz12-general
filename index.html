@@ -447,13 +447,31 @@
             height: 100%;
             background: linear-gradient(90deg, var(--danger), var(--accent), var(--success));
         }
-        #q-image-container { text-align: center; margin-bottom: 14px; }
+        #q-image-container {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 58%),
+                linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92));
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 18px 40px rgba(2, 6, 23, 0.34);
+        }
         .q-img-display {
             max-width: 100%;
-            max-height: 220px;
-            object-fit: cover;
-            border-radius: 14px;
-            border: 1px solid var(--border);
+            max-height: 260px;
+            object-fit: contain;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.97), rgba(241,245,249,0.94));
+            padding: 10px;
+            box-shadow:
+                0 16px 30px rgba(15, 23, 42, 0.22),
+                inset 0 0 0 1px rgba(255,255,255,0.45);
         }
         #q-hint {
             text-align: center;
