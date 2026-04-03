@@ -25,89 +25,35 @@
             justify-content: center;
             align-items: center;
             background:
-                radial-gradient(circle at top, rgba(14, 165, 233, 0.18), transparent 30%),
-                linear-gradient(180deg, #020617 0%, #0f172a 60%, #111827 100%);
+                linear-gradient(180deg, rgba(2, 6, 23, 0.72), rgba(15, 23, 42, 0.84)),
+                radial-gradient(circle at center, rgba(245, 158, 11, 0.14), transparent 42%),
+                url("./Quiz%20Nights-Logo.png") center center / cover no-repeat fixed;
             color: var(--text);
             padding: 1rem;
             position: relative;
             overflow-x: hidden;
         }
-        body.login-screen-active {
-            align-items: flex-start;
-            padding-top: 136px;
-            padding-bottom: 2rem;
-        }
         body::before {
-            content: "?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?";
+            content: "";
             position: fixed;
-            left: 0;
-            top: 5vh;
-            white-space: pre;
-            font-size: clamp(3.5rem, 8vw, 7rem);
-            font-weight: 900;
-            line-height: 0.9;
-            letter-spacing: 0.3em;
-            color: rgba(248, 250, 252, 0.09);
-            text-shadow:
-                70px 40px 0 rgba(14, 165, 233, 0.18),
-                210px 150px 0 rgba(168, 85, 247, 0.16),
-                360px 10px 0 rgba(245, 158, 11, 0.16),
-                520px 120px 0 rgba(16, 185, 129, 0.14),
-                760px 55px 0 rgba(239, 68, 68, 0.15),
-                980px 180px 0 rgba(56, 189, 248, 0.13),
-                1180px 90px 0 rgba(250, 204, 21, 0.14),
-                1340px 220px 0 rgba(236, 72, 153, 0.13),
-                120px 360px 0 rgba(251, 191, 36, 0.12),
-                310px 500px 0 rgba(34, 197, 94, 0.12),
-                540px 390px 0 rgba(99, 102, 241, 0.14),
-                780px 540px 0 rgba(14, 165, 233, 0.14),
-                1010px 420px 0 rgba(244, 114, 182, 0.12),
-                1240px 600px 0 rgba(245, 158, 11, 0.13);
+            inset: 0;
+            background:
+                radial-gradient(circle at center, rgba(255, 214, 144, 0.12), transparent 32%),
+                linear-gradient(180deg, rgba(2, 6, 23, 0.25), rgba(2, 6, 23, 0.72));
             z-index: 0;
             pointer-events: none;
+            backdrop-filter: blur(2px);
         }
         body::after {
-            content: "QUIZ K-NIGHTS";
+            content: "";
             position: fixed;
-            top: 2vh;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: clamp(2.8rem, 6vw, 5.4rem);
-            font-weight: 900;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(245, 158, 11, 0.16);
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(245, 158, 11, 0.08), transparent 48%);
             z-index: 0;
             pointer-events: none;
         }
-        .home-logo-btn {
-            position: fixed;
-            top: 18px;
-            left: 18px;
-            width: 88px;
-            height: 88px;
-            padding: 6px;
-            border-radius: 24px;
-            border: 1px solid rgba(148, 163, 184, 0.24);
-            background: rgba(8, 15, 28, 0.72);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
-            backdrop-filter: blur(8px);
-            z-index: 3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .home-logo-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 18px;
-            display: block;
-        }
         .container {
-            width: min(100%, 900px);
+            width: min(100%, 720px);
             background: rgba(8, 15, 28, 0.8);
             border: 1px solid rgba(148, 163, 184, 0.22);
             border-radius: 24px;
@@ -116,16 +62,10 @@
             backdrop-filter: blur(10px);
             position: relative;
             z-index: 1;
-            transition: margin 0.2s ease;
-        }
-        body.login-screen-active .container {
-            margin-right: 0;
         }
         #scr-login {
             position: relative;
             padding-top: 0;
-            max-width: 900px;
-            margin: 0 auto;
         }
         .hidden { display: none !important; }
         h1 {
@@ -323,9 +263,9 @@
         }
         .login-auth-panel {
             position: fixed;
-            top: 18px;
-            right: 18px;
-            width: min(300px, calc(100vw - 2rem));
+            top: 2.8vh;
+            right: 1.6rem;
+            width: min(330px, calc(100vw - 2rem));
             background: rgba(15, 23, 42, 0.92);
             border: 1px solid var(--border);
             border-radius: 18px;
@@ -334,8 +274,6 @@
             gap: 10px;
             z-index: 3;
             box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-            max-height: calc(100vh - 36px);
-            overflow-y: auto;
         }
         .login-auth-panel h3 {
             color: var(--accent);
@@ -595,24 +533,6 @@
         .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
             display: flex;
             gap: 10px;
-        }
-        .start-mode-actions {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 0.75rem;
-        }
-        .start-mode-actions button {
-            min-height: 58px;
-        }
-        .leaderboard-main-btn {
-            background: linear-gradient(135deg, #7c3aed, #a855f7);
-            box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
-        }
-        .reviews-main-btn {
-            background: linear-gradient(135deg, #d4a017, #f59e0b);
-            box-shadow: 0 14px 28px rgba(245, 158, 11, 0.22);
-            color: #fff7d6;
         }
         .lifeline-container {
             margin-top: 14px;
@@ -953,25 +873,7 @@
             }
         }
         @media (max-width: 640px) {
-            .container {
-                padding: 1rem;
-                padding-top: 4.75rem;
-            }
-            body.login-screen-active {
-                align-items: center;
-                padding-top: 1rem;
-            }
-            body.login-screen-active .container {
-                margin-right: 0;
-            }
-            .home-logo-btn {
-                width: 54px;
-                height: 54px;
-                top: 10px;
-                left: 10px;
-                padding: 4px;
-                border-radius: 16px;
-            }
+            .container { padding: 1rem; }
             .login-auth-panel {
                 position: static;
                 width: 100%;
@@ -1000,9 +902,6 @@
                 line-height: 1.15;
             }
             .summary-grid { grid-template-columns: 1fr; }
-            .start-mode-actions {
-                grid-template-columns: 1fr;
-            }
             .review-summary {
                 grid-template-columns: 1fr;
             }
@@ -1025,9 +924,6 @@
     </style>
 </head>
 <body>
-<button class="home-logo-btn" onclick="goToHomePage()" title="Αρχική Σελίδα" aria-label="Αρχική Σελίδα">
-    <img src="Quiz Nights-Logo.png" alt="Quiz Nights">
-</button>
 <div class="container">
 
     <div id="scr-login">
@@ -1078,14 +974,11 @@
             <input type="text" id="fname" placeholder="Όνομα">
             <input type="text" id="lname" placeholder="Επώνυμο">
         </div>
-        <div class="start-mode-actions">
-            <button onclick="startQuiz('knowledge')">Έναρξη Quiz Γνώσεων</button>
-            <button onclick="startQuiz('image')">Έναρξη Quiz με Εικόνες</button>
-        </div>
+        <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
         <div class="top-actions" style="margin-top:10px;">
             <button class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
-            <button class="leaderboard-main-btn" onclick="openLeaderboard()">Leaderboard</button>
-            <button class="reviews-main-btn" onclick="openReviews()">Reviews</button>
+            <button class="secondary" onclick="openLeaderboard()">Leaderboard</button>
+            <button class="secondary" onclick="openReviews()">Reviews</button>
         </div>
         <div class="review-entry">
             <div class="review-entry-header">
@@ -1273,10 +1166,6 @@ const QUESTION_SEEN_IDS_KEY = 'quiz12_seen_question_ids';
 const QUESTION_HISTORY_KEY = 'quiz12_recent_question_history';
 const QUESTION_CYCLE_QUEUE_KEY = 'quiz12_question_cycle_queue';
 const QUESTION_MEMORY_RECENT_LIMIT = 40;
-const QUIZ_MODE_LABELS = {
-    knowledge: 'Quiz Γνώσεων',
-    image: 'Quiz με Εικόνες'
-};
 const QUESTION_IMAGE_ALIASES = {
     'assets/images/questions/flags/japan.svg': 'assets/images/questions/flags/Flag_of_Japan.svg.png',
     'assets/images/questions/flags/france.svg': 'assets/images/questions/flags/download.jpg',
@@ -1315,7 +1204,6 @@ let reserveQuestions = [];
 let user = { f: "", l: "", id: "" };
 let cur = 0, score = 0, correct = 0;
 let timeLeft = QUESTION_TIME, timer = null;
-let currentQuizMode = 'knowledge';
 let answersStatus = [];
 let revealedHints = [];
 let hintPenaltyUsed = [];
@@ -1984,17 +1872,8 @@ function buildQuestionSelection(questionMap, count) {
     return { selectedIds, updatedSeenIds, updatedRecentIds };
 }
 
-function filterQuestionMapByMode(questionMap, mode = currentQuizMode) {
-    const normalizedMode = mode === 'image' ? 'image' : 'knowledge';
-    return new Map(Array.from(questionMap.entries()).filter(([, question]) => {
-        const hasImage = !!(question?.img && String(question.img).trim());
-        return normalizedMode === 'image' ? hasImage : !hasImage;
-    }));
-}
-
-function initializeQuestionSet(mode = currentQuizMode) {
-    currentQuizMode = mode === 'image' ? 'image' : 'knowledge';
-    const questionMap = filterQuestionMapByMode(getUniqueQuestionMap(), currentQuizMode);
+function initializeQuestionSet() {
+    const questionMap = getUniqueQuestionMap();
     const allIds = Array.from(questionMap.keys());
     const { selectedIds, updatedSeenIds, updatedRecentIds } = buildQuestionSelection(questionMap, QUESTIONS_PER_GAME);
 
@@ -2481,7 +2360,7 @@ async function renderLeaderboard(targetId = user.id) {
     return renderLeaderboardEntries(sortLeaderboard(getLeaderboard()), targetId);
 }
 
-function resetQuizState(mode = currentQuizMode) {
+function resetQuizState() {
     clearInterval(timer);
     cur = 0;
     score = 0;
@@ -2493,7 +2372,7 @@ function resetQuizState(mode = currentQuizMode) {
     lifeline5050Used = false;
     lifelineAudienceUsed = false;
     lifelineSwapUsed = false;
-    initializeQuestionSet(mode);
+    initializeQuestionSet();
 }
 
 window.toggleHint = function toggleHint() {
@@ -2534,7 +2413,6 @@ function show(id) {
     ['scr-login', 'scr-reviews', 'scr-quiz', 'scr-end', 'scr-leaderboard'].forEach(s => {
         document.getElementById(s).classList.toggle('hidden', s !== id);
     });
-    document.body.classList.toggle('login-screen-active', id === 'scr-login');
 }
 
 function updateTimerDisplay() {
@@ -2544,20 +2422,12 @@ function updateTimerDisplay() {
     document.getElementById('timer-count').classList.toggle('urgent', timeLeft <= 5);
 }
 
-function startQuiz(mode = 'knowledge') {
+function startQuiz() {
     const f = (currentAuthProfile?.firstName || document.getElementById('fname').value).trim();
     const l = (currentAuthProfile?.lastName || document.getElementById('lname').value).trim();
     if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
     if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
-    const normalizedMode = mode === 'image' ? 'image' : 'knowledge';
-    const availableQuestionCount = filterQuestionMapByMode(getUniqueQuestionMap(), normalizedMode).size;
-    if (!availableQuestionCount) {
-        alert(normalizedMode === 'image'
-            ? 'Δεν υπάρχουν διαθέσιμες ερωτήσεις με εικόνες.'
-            : 'Δεν υπάρχουν διαθέσιμες ερωτήσεις γνώσεων.');
-        return;
-    }
-    resetQuizState(normalizedMode);
+    resetQuizState();
     const nickname = (currentAuthProfile?.nickname || '').trim();
     const photoUrl = currentAuthProfile?.photoUrl || '';
     user = {
@@ -2593,12 +2463,8 @@ function openDuelMode() {
     window.location.href = DUEL_MODE_URL;
 }
 
-function goToHomePage() {
-    window.location.href = './';
-}
-
 function restartQuiz() {
-    resetQuizState(currentQuizMode);
+    resetQuizState();
     document.getElementById('fname').value = currentAuthProfile?.firstName || '';
     document.getElementById('lname').value = currentAuthProfile?.lastName || '';
     document.getElementById('score-display').textContent = '0';
@@ -2929,7 +2795,6 @@ async function endQuiz() {
 
 document.title = QUIZ_TITLE;
 document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
-document.body.classList.add('login-screen-active');
 updateAudioButtons();
 resetReviewForm();
 initFirebaseLeaderboard().finally(async () => {
