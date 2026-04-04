@@ -1353,7 +1353,11 @@ const QUESTION_IMAGE_ALIASES = {
     'assets/images/questions/animals/octopus.svg': 'assets/images/questions/animals/Octopus.webp',
     'assets/images/questions/animals/giraffe.svg': 'assets/images/questions/animals/giraffe.jpg',
     'assets/images/questions/animals/shark.svg': 'assets/images/questions/animals/shark.jpg',
-    'assets/images/questions/animals/panda.svg': 'assets/images/questions/animals/panda.jpg'
+    'assets/images/questions/animals/panda.svg': 'assets/images/questions/animals/panda.jpg',
+    'assets/images/questions/logos/arches.svg': 'assets/images/questions/logos/arches.png',
+    'assets/images/questions/logos/swoosh.svg': 'assets/images/questions/logos/swoosh.webp',
+    'assets/images/questions/logos/starbucks-cup.svg': 'assets/images/questions/logos/starbucks-cup.png',
+    'assets/images/questions/logos/pepsi-circle.svg': 'assets/images/questions/logos/pepsi-circle.webp'
 };
 
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
@@ -1387,6 +1391,8 @@ let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
 let audioContext = null;
 let audioUnlocked = false;
 let musicLoopTimer = null;
+let radioAudio = null;
+const RADIO_STREAM_URL = 'https://i4.streams.ovh/sc/musicfactory/stream';
 
 function normalizePlayerId(firstName, lastName) {
     return `${firstName.trim().toLowerCase()}::${lastName.trim().toLowerCase()}`;
@@ -1628,30 +1634,33 @@ function stopBackgroundMusic() {
         clearTimeout(musicLoopTimer);
         musicLoopTimer = null;
     }
+    if (radioAudio) {
+        radioAudio.pause();
+        radioAudio.currentTime = 0;
+    }
 }
 
 async function startBackgroundMusic() {
     stopBackgroundMusic();
     if (!musicEnabled) return;
-    const ctx = await ensureAudioContext();
-    if (!ctx) return;
-    const bassPattern = [196.0, 146.83, 164.81, 130.81, 196.0, 146.83, 174.61, 130.81];
-    const leadPattern = [392.0, 440.0, 493.88, 523.25, 493.88, 440.0, 392.0, 349.23];
-    const harmonyPattern = [293.66, 329.63, 349.23, 392.0, 349.23, 329.63, 293.66, 261.63];
-    let noteIndex = 0;
-    const loop = () => {
-        if (!musicEnabled || !audioContext) {
-            stopBackgroundMusic();
-            return;
-        }
-        const now = audioContext.currentTime + 0.02;
-        pulseTone(audioContext, bassPattern[noteIndex % bassPattern.length], now, 0.68, 'triangle', 0.012);
-        pulseTone(audioContext, leadPattern[noteIndex % leadPattern.length], now + 0.08, 0.42, 'sine', 0.013);
-        pulseTone(audioContext, harmonyPattern[noteIndex % harmonyPattern.length], now + 0.16, 0.36, 'sine', 0.008);
-        noteIndex++;
-        musicLoopTimer = setTimeout(loop, 760);
+    if (!radioAudio) {
+        radioAudio = new Audio(RADIO_STREAM_URL);
+        radioAudio.crossOrigin = 'anonymous';
+        radioAudio.preload = 'none';
+        radioAudio.volume = 0.35;
+        radioAudio.setAttribute('playsinline', 'true');
+    } else if (radioAudio.src !== RADIO_STREAM_URL) {
+        radioAudio.src = RADIO_STREAM_URL;
+    }
+    try {
+        await radioAudio.play();
+    } catch (error) {
+        console.warn('Radio stream playback blocked or unavailable:', error);
+        musicEnabled = false;
+        localStorage.setItem('quiz12_music_enabled', 'false');
+        updateAudioButtons();
+        return;
     };
-    loop();
 }
 
 function updateAudioButtons() {
