@@ -2419,10 +2419,16 @@ function renderReviewList(entries) {
 
 async function fetchReviews() {
     if (firebaseReady) {
-        const snapshot = await firebaseApi.getDocs(firebaseApi.collection(firebaseDb, REVIEW_COLLECTION));
-        reviewEntriesCache = snapshot.docs
-            .map(doc => normalizeReviewEntry({ id: doc.id, ...doc.data() }))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        try {
+            const snapshot = await firebaseApi.getDocs(firebaseApi.collection(firebaseDb, REVIEW_COLLECTION));
+            reviewEntriesCache = snapshot.docs
+                .map(doc => normalizeReviewEntry({ id: doc.id, ...doc.data() }))
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        } catch {
+            reviewEntriesCache = getLocalReviews()
+                .map(normalizeReviewEntry)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
     } else {
         reviewEntriesCache = getLocalReviews()
             .map(normalizeReviewEntry)
@@ -2504,7 +2510,11 @@ window.submitReview = async function submitReview() {
         statusEl.textContent = 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.';
         await fetchReviews();
     } catch (error) {
-        statusEl.textContent = `Δεν αποθηκεύτηκε το review: ${error.message}`;
+        const next = [payload, ...getLocalReviews()].slice(0, 60);
+        saveLocalReviews(next);
+        resetReviewForm();
+        statusEl.textContent = 'Το review αποθηκεύτηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.';
+        await fetchReviews();
     }
 };
 
