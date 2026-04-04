@@ -1653,6 +1653,7 @@ async function startBackgroundMusic(forceRestart = false) {
         radioAudio = new Audio(RADIO_STREAM_URL);
         radioAudio.crossOrigin = 'anonymous';
         radioAudio.preload = 'none';
+        radioAudio.autoplay = true;
         radioAudio.volume = 0.35;
         radioAudio.setAttribute('playsinline', 'true');
     } else if (radioAudio.src !== RADIO_STREAM_URL) {
@@ -1676,6 +1677,7 @@ function bindMusicResumeHooks() {
     if (musicResumeHooksBound) return;
     musicResumeHooksBound = true;
     const retryStart = () => { if (musicEnabled) startBackgroundMusic(); };
+    window.addEventListener('load', retryStart);
     window.addEventListener('pageshow', retryStart);
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && musicEnabled) {
