@@ -2626,12 +2626,13 @@ function renderDetailsPanel(entry) {
 
     const answers = Array.isArray(entry.answers) ? entry.answers : [];
     const correctAnswers = answers.filter(answer => answer.isCorrect).length;
+    const totalQuestions = answers.length || (Number(entry.total_correct || 0) + Number(entry.total_wrong || 0));
     const entryDisplayName = getPreferredDisplayName(entry);
     detailsContent.className = '';
     detailsContent.innerHTML = `
         <div class="question-review-meta">
             <strong>${entryDisplayName}</strong><br>
-            Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${questions.length}<br>
+            Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${totalQuestions}<br>
             Played: ${formatDate(entry.lastPlayed)}
         </div>
         <div class="question-review">
@@ -3117,6 +3118,8 @@ async function endQuiz() {
             score,
             acc,
             accValue: accuracyValue,
+            total_correct: correct,
+            total_wrong: questions.length - correct,
             games: 1,
             lastPlayed,
             lastPlayedTs: lastPlayed,
