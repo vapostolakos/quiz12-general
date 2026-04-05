@@ -5943,3 +5943,88 @@ const EXTRA_ALL_CAPITALS_QUESTIONS = [
 ];
 
 window.QUIZ12_QUESTIONS.push(...EXTRA_ALL_CAPITALS_QUESTIONS);
+
+const EXTRA_NEW_HERO_IMAGE_QUESTIONS = [
+    {
+        q: "Ποιος ήρωας της Marvel εμφανίζεται στην εικόνα;",
+        o: ["Doctor Strange", "Loki", "Moon Knight", "Iron Fist"],
+        a: 0,
+        h: "Είναι μάγος του MCU και πρώην νευροχειρουργός.",
+        r: "Ο χαρακτήρας της εικόνας είναι ο Doctor Strange.",
+        img: "assets/images/questions/heroes/doctor-strange.jpg"
+    },
+    {
+        q: "Ποια ηρωίδα της DC εμφανίζεται στην εικόνα;",
+        o: ["Supergirl", "Wonder Woman", "Elektra", "Black Widow"],
+        a: 1,
+        h: "Είναι Αμαζόνα και πριγκίπισσα της Θεμίσκυρας.",
+        r: "Η ηρωίδα της εικόνας είναι η Wonder Woman.",
+        img: "assets/images/questions/heroes/wonder-woman.jpg"
+    },
+    {
+        q: "Ποιος μυστικιστής ήρωας της DC εμφανίζεται στην εικόνα;",
+        o: ["Doctor Fate", "Hawkman", "Black Adam", "Shazam"],
+        a: 0,
+        h: "Φορά χρυσό κράνος και συνδέεται με τον Nabu.",
+        r: "Ο ήρωας της εικόνας είναι ο Doctor Fate.",
+        img: "assets/images/questions/heroes/doctor-fate.jpg"
+    },
+    {
+        q: "Ποια ηρωίδα της Marvel εμφανίζεται στην εικόνα;",
+        o: ["Scarlet Witch", "Captain Marvel", "Invisible Woman", "Wasp"],
+        a: 1,
+        h: "Το πραγματικό της όνομα είναι Carol Danvers.",
+        r: "Η ηρωίδα της εικόνας είναι η Captain Marvel.",
+        img: "assets/images/questions/heroes/captain-marvel.jpg"
+    },
+    {
+        q: "Ποιος κακός της Marvel εμφανίζεται στην εικόνα με το Infinity Gauntlet;",
+        o: ["Ultron", "Apocalypse", "Thanos", "Darkseid"],
+        a: 2,
+        h: "Αναζήτησε τις Infinity Stones.",
+        r: "Ο κακός της εικόνας είναι ο Thanos.",
+        img: "assets/images/questions/heroes/thanos.jpg"
+    },
+    {
+        q: "Ποιος αντιήρωας της Marvel εμφανίζεται στην εικόνα;",
+        o: ["Deadpool", "Punisher", "Daredevil", "Deathstroke"],
+        a: 0,
+        h: "Είναι γνωστός για το χιούμορ και το σπάσιμο του fourth wall.",
+        r: "Ο χαρακτήρας της εικόνας είναι ο Deadpool.",
+        img: "assets/images/questions/heroes/deadpool.jpg"
+    },
+    {
+        q: "Ποια μεταλλαγμένη των X-Men εμφανίζεται στην εικόνα;",
+        o: ["Rogue", "Storm", "Jean Grey", "Mystique"],
+        a: 2,
+        h: "Συνδέεται με τη δύναμη του Phoenix Force.",
+        r: "Η ηρωίδα της εικόνας είναι η Jean Grey.",
+        img: "assets/images/questions/heroes/jean-grey.jpg"
+    },
+    {
+        q: "Ποιος ήρωας της Marvel εμφανίζεται στην εικόνα;",
+        o: ["Black Panther", "Blade", "Killmonger", "Falcon"],
+        a: 0,
+        h: "Είναι ο βασιλιάς της Wakanda.",
+        r: "Ο χαρακτήρας της εικόνας είναι ο Black Panther.",
+        img: "assets/images/questions/heroes/black-panther.jpg"
+    },
+    {
+        q: "Ποιος χαρακτήρας των Watchmen εμφανίζεται στην εικόνα;",
+        o: ["Rorschach", "Ozymandias", "Doctor Manhattan", "The Comedian"],
+        a: 2,
+        h: "Έχει μπλε δέρμα και σχεδόν θεϊκές δυνάμεις.",
+        r: "Ο χαρακτήρας της εικόνας είναι ο Doctor Manhattan.",
+        img: "assets/images/questions/heroes/doctor-manhattan.jpg"
+    },
+    {
+        q: "Ποιο διάσημο μνημείο εμφανίζεται στην εικόνα;",
+        o: ["Angkor Wat", "Taj Mahal", "Palace of Versailles", "Hagia Sophia"],
+        a: 1,
+        h: "Βρίσκεται στην Άγκρα της Ινδίας.",
+        r: "Το μνημείο της εικόνας είναι το Taj Mahal.",
+        img: "assets/images/questions/landmarks/taj-mahal.jpg"
+    }
+];
+
+window.QUIZ12_QUESTIONS.push(...EXTRA_NEW_HERO_IMAGE_QUESTIONS);
