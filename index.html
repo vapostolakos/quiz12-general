@@ -1113,6 +1113,7 @@
             </div>
             <div id="main-auth-user-card" class="auth-user-card hidden"></div>
             <button class="secondary hidden" id="btn-main-edit-profile" onclick="toggleMainProfileEditor()">Επεξεργασία Προφίλ</button>
+            <button class="secondary hidden" id="btn-main-edit-review" onclick="editMyReview()">Επεξεργασία Review</button>
             <button class="secondary hidden" id="btn-main-logout" onclick="logoutMainAccount()">Logout</button>
             <div id="main-auth-status" class="auth-status-mini">Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.</div>
             <div class="audio-controls">
@@ -1197,7 +1198,7 @@
                 <textarea id="review-comment" placeholder="Τι σου άρεσε ή τι σε δυσκόλεψε στο quiz;"></textarea>
                 <textarea id="review-suggestion" placeholder="Τι αλλαγές, προσθήκες ή βελτιώσεις θα ήθελες να γίνουν;"></textarea>
                 <div class="review-actions">
-                    <button onclick="submitReview()">Υποβολή Review</button>
+                    <button id="btn-submit-review" onclick="submitReview()">Υποβολή Review</button>
                     <button class="secondary" onclick="show('scr-login')">Επιστροφή</button>
                 </div>
                 <div id="review-status" class="review-status">Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.</div>
@@ -1422,6 +1423,7 @@ let currentAuthUser = null;
   let selectedEntryId = null;
   let reviewRating = 0;
   let reviewEntriesCache = [];
+  let currentUserReviewEntry = null;
   let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
@@ -1762,9 +1764,10 @@ function updateMainAuthUi() {
     const status = document.getElementById('main-auth-status');
     const logoutBtn = document.getElementById('btn-main-logout');
     const editBtn = document.getElementById('btn-main-edit-profile');
+    const reviewBtn = document.getElementById('btn-main-edit-review');
     const authForm = document.getElementById('main-auth-form');
     const authUserCard = document.getElementById('main-auth-user-card');
-    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn || !authForm || !authUserCard) return;
+    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn || !reviewBtn || !authForm || !authUserCard) return;
 
     if (currentAuthProfile) {
         manualFields.classList.add('hidden');
@@ -1790,6 +1793,7 @@ function updateMainAuthUi() {
         status.textContent = 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.';
         logoutBtn.classList.remove('hidden');
         editBtn.classList.remove('hidden');
+        reviewBtn.classList.remove('hidden');
     } else {
         manualFields.classList.remove('hidden');
         profileBanner.classList.add('hidden');
@@ -1800,6 +1804,7 @@ function updateMainAuthUi() {
         status.textContent = 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.';
         logoutBtn.classList.add('hidden');
         editBtn.classList.add('hidden');
+        reviewBtn.classList.add('hidden');
         mainProfileEditorOpen = false;
         document.getElementById('main-profile-editor')?.classList.add('hidden');
     }
@@ -2442,6 +2447,34 @@ function renderReviewStars(rating) {
     return '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
 }
 
+function getCurrentUserReviewEntry(entries = reviewEntriesCache) {
+    if (!currentAuthUser?.uid) return null;
+    return (entries || []).find(entry => String(entry.authUid || '').trim() === currentAuthUser.uid) || null;
+}
+
+function updateReviewEditorUi() {
+    const submitBtn = document.getElementById('btn-submit-review');
+    const statusEl = document.getElementById('review-status');
+    if (submitBtn) {
+        submitBtn.textContent = currentUserReviewEntry ? 'Αποθήκευση Αλλαγών' : 'Υποβολή Review';
+    }
+    if (statusEl && currentAuthUser?.uid && currentUserReviewEntry && !statusEl.dataset.manualMessage) {
+        statusEl.textContent = 'Έχεις ήδη αφήσει review. Μπορείς να το επεξεργαστείς και να το ενημερώσεις όποτε θέλεις.';
+    }
+}
+
+function loadReviewIntoForm(entry) {
+    if (!entry) return;
+    document.getElementById('review-comment').value = entry.comment || '';
+    document.getElementById('review-suggestion').value = entry.suggestion || '';
+    window.setReviewRating(entry.rating || 0);
+    const statusEl = document.getElementById('review-status');
+    if (statusEl) {
+        statusEl.dataset.manualMessage = 'true';
+        statusEl.textContent = 'Επεξεργάζεσαι το υπάρχον review σου. Πάτησε Αποθήκευση Αλλαγών για update.';
+    }
+}
+
 function updateReviewSummary(entries) {
     const total = entries.length;
     const average = total ? (entries.reduce((sum, item) => sum + Number(item.rating || 0), 0) / total).toFixed(1) : '-';
@@ -2492,7 +2525,9 @@ async function fetchReviews() {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
+    currentUserReviewEntry = getCurrentUserReviewEntry(reviewEntriesCache);
     renderReviewList(reviewEntriesCache);
+    updateReviewEditorUi();
     return reviewEntriesCache;
 }
 
@@ -2522,13 +2557,42 @@ function resetReviewForm() {
     reviewRating = 0;
     document.getElementById('review-comment').value = '';
     document.getElementById('review-suggestion').value = '';
-    document.getElementById('review-status').textContent = 'Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.';
+    const statusEl = document.getElementById('review-status');
+    delete statusEl.dataset.manualMessage;
+    statusEl.textContent = currentUserReviewEntry
+        ? 'Έχεις ήδη αφήσει review. Μπορείς να το επεξεργαστείς και να το ενημερώσεις όποτε θέλεις.'
+        : 'Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.';
     window.setReviewRating(0);
+    updateReviewEditorUi();
 }
 
 window.openReviews = async function openReviews() {
     show('scr-reviews');
     await fetchReviews();
+};
+
+window.editMyReview = async function editMyReview() {
+    if (!currentAuthUser?.uid) {
+        show('scr-reviews');
+        const statusEl = document.getElementById('review-status');
+        if (statusEl) {
+            statusEl.dataset.manualMessage = 'true';
+            statusEl.textContent = 'Συνδέσου πρώτα με το προφίλ σου για να μπορείς να επεξεργαστείς το review σου.';
+        }
+        return;
+    }
+    show('scr-reviews');
+    await fetchReviews();
+    if (currentUserReviewEntry) {
+        loadReviewIntoForm(currentUserReviewEntry);
+    } else {
+        resetReviewForm();
+        const statusEl = document.getElementById('review-status');
+        if (statusEl) {
+            statusEl.dataset.manualMessage = 'true';
+            statusEl.textContent = 'Δεν έχεις αφήσει ακόμα review. Συμπλήρωσε τη φόρμα για να δημιουργήσεις το πρώτο σου.';
+        }
+    }
 };
 
 window.submitReview = async function submitReview() {
@@ -2546,31 +2610,41 @@ window.submitReview = async function submitReview() {
         return;
     }
 
+    const existingReview = currentAuthUser?.uid ? getCurrentUserReviewEntry(reviewEntriesCache) : null;
     const payload = {
-        id: createAttemptId(),
+        id: existingReview?.id || createAttemptId(),
         rating: reviewRating,
         comment,
         suggestion,
         author_name: getReviewDisplayName(),
         auth_uid: currentAuthUser?.uid || '',
-        created_at: new Date().toISOString()
+        created_at: existingReview?.createdAt || new Date().toISOString(),
+        updated_at: new Date().toISOString()
     };
 
     try {
         if (firebaseReady) {
             await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, REVIEW_COLLECTION, payload.id), payload);
         } else {
-            const next = [payload, ...getLocalReviews()].slice(0, 60);
+            const next = [payload, ...getLocalReviews().filter(entry => String(entry.id || '') !== payload.id)].slice(0, 60);
             saveLocalReviews(next);
         }
+        currentUserReviewEntry = normalizeReviewEntry(payload);
         resetReviewForm();
-        statusEl.textContent = 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.';
+        statusEl.dataset.manualMessage = 'true';
+        statusEl.textContent = existingReview
+            ? 'Το review σου ενημερώθηκε επιτυχώς.'
+            : 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.';
         await fetchReviews();
     } catch (error) {
-        const next = [payload, ...getLocalReviews()].slice(0, 60);
+        const next = [payload, ...getLocalReviews().filter(entry => String(entry.id || '') !== payload.id)].slice(0, 60);
         saveLocalReviews(next);
+        currentUserReviewEntry = normalizeReviewEntry(payload);
         resetReviewForm();
-        statusEl.textContent = 'Το review αποθηκεύτηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.';
+        statusEl.dataset.manualMessage = 'true';
+        statusEl.textContent = existingReview
+            ? 'Το review σου ενημερώθηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.'
+            : 'Το review αποθηκεύτηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.';
         await fetchReviews();
     }
 };
