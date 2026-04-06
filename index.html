@@ -1835,11 +1835,15 @@ function updateAudioButtons() {
     const soundBtn = document.getElementById('btn-sound-toggle');
     const musicBtn = document.getElementById('btn-music-toggle');
     if (soundBtn) {
-        soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι ${soundEffectsEnabled ? 'On' : 'Off'}`;
+        soundBtn.textContent = currentLanguage === 'en'
+            ? `${soundEffectsEnabled ? '🔊' : '🔇'} Sound: ${soundEffectsEnabled ? 'On' : 'Off'}`
+            : `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι: ${soundEffectsEnabled ? 'On' : 'Off'}`;
         soundBtn.classList.toggle('active', soundEffectsEnabled);
     }
     if (musicBtn) {
-        musicBtn.textContent = `${musicEnabled ? '🔊' : '🔇'} ${currentLanguage === 'en' ? `Music ${musicEnabled ? 'ON' : 'OFF'}` : `Μουσική ${musicEnabled ? 'ON' : 'OFF'}`}`;
+        musicBtn.textContent = currentLanguage === 'en'
+            ? `${musicEnabled ? '🎵' : '🎼'} Music: ${musicEnabled ? 'On' : 'Off'}`
+            : `${musicEnabled ? '🎵' : '🎼'} Μουσική: ${musicEnabled ? 'On' : 'Off'}`;
         musicBtn.classList.toggle('active', musicEnabled);
     }
 }
@@ -1854,9 +1858,10 @@ window.toggleSoundEffects = async function toggleSoundEffects() {
 window.toggleMusic = async function toggleMusic() {
     musicEnabled = !musicEnabled;
     localStorage.setItem(GLOBAL_MUSIC_STORAGE_KEY, String(musicEnabled));
+    localStorage.setItem(LEGACY_MAIN_MUSIC_STORAGE_KEY, String(musicEnabled));
     updateAudioButtons();
     if (musicEnabled) {
-        await startBackgroundMusic();
+        await startBackgroundMusic(true);
     } else {
         stopBackgroundMusic();
     }
