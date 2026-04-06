@@ -1224,7 +1224,7 @@
         </div>
         <div class="table-wrap">
             <table>
-                    <thead><tr><th>#</th><th>Παίκτης</th><th>Total Score</th><th>Games</th><th>Accuracy</th><th>Date</th></tr></thead>
+                <thead><tr><th>#</th><th>Παίκτης</th><th>Score</th><th>Accuracy</th><th>Date</th></tr></thead>
                 <tbody id="lb-body"></tbody>
             </table>
         </div>
@@ -1243,11 +1243,9 @@
                     <tr>
                         <th>#</th>
                         <th class="sortable" onclick="changeSort('name')">Player</th>
-                        <th class="sortable" onclick="changeSort('score')">Total Score</th>
-                        <th class="sortable" onclick="changeSort('games')">Games</th>
+                        <th class="sortable" onclick="changeSort('score')">Score</th>
                         <th class="sortable" onclick="changeSort('accValue')">Accuracy</th>
                         <th class="sortable" onclick="changeSort('lastPlayedTs')">Last Played</th>
-                        <th>Friend</th>
                         <th class="delete-cell">Admin</th>
                     </tr>
                 </thead>
@@ -1255,12 +1253,8 @@
             </table>
         </div>
         <div id="details-panel" class="details-panel">
-            <h3>Ανάλυση Παίκτη</h3>
-            <div id="details-content" class="details-empty">Πάτησε έναν παίκτη από τον πίνακα για να δεις το συνολικό του προφίλ και το τελευταίο παιχνίδι του.</div>
-        </div>
-        <div id="friends-panel" class="details-panel">
-            <h3>Οι Φίλοι Μου</h3>
-            <div id="friends-content" class="details-empty">Συνδέσου για να αποθηκεύεις φίλους και να ξεκινάς γρήγορα μονομαχία μαζί τους.</div>
+            <h3>Ανάλυση Συμμετοχής</h3>
+            <div id="details-content" class="details-empty">Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.</div>
         </div>
         <div class="leaderboard-actions" style="margin-top:14px;">
             <button class="secondary" onclick="show('scr-login')">Back</button>
@@ -1283,8 +1277,6 @@ const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
 const PROFILE_COLLECTION = 'quiz12_duel_profiles';
 const REVIEW_COLLECTION = 'quiz12_reviews';
-const ADMIN_EMAIL = 'vapostolakos@gmail.com';
-const ADMIN_SESSION_KEY = 'quiz12_admin_unlocked';
 const QUESTION_TIME = 45;
 const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
@@ -1399,8 +1391,7 @@ let currentAuthUser = null;
   let selectedEntryId = null;
   let reviewRating = 0;
   let reviewEntriesCache = [];
-  let leaderboardEntriesCache = [];
-  let adminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
 let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
@@ -1445,92 +1436,14 @@ function updateAdminUi() {
     const resetBtn = document.getElementById('btn-admin-reset');
     const unlockBtn = document.getElementById('btn-admin-unlock');
     if (!resetBtn || !unlockBtn) return;
-    const allowed = isAdminUser();
-    if (!allowed) {
-        adminUnlocked = false;
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    }
-    resetBtn.classList.toggle('visible', allowed && adminUnlocked);
-    unlockBtn.style.display = allowed ? '' : 'none';
-    unlockBtn.textContent = adminUnlocked ? 'Admin Lock' : 'Admin Unlock';
-}
-
-function isAdminUser() {
-    return String(currentAuthUser?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
-}
-
-function getEntryPlayerKey(entry = {}) {
-    const authUid = String(entry.authUid || entry.auth_uid || '').trim();
-    if (authUid) return `uid:${authUid}`;
-    const playerId = String(entry.player_id || '').trim();
-    if (playerId) return `pid:${playerId}`;
-    const firstName = String(entry.firstName || entry.first_name || '').trim();
-    const lastName = String(entry.lastName || entry.last_name || '').trim();
-    if (firstName || lastName) return `name:${normalizePlayerId(firstName || '?', lastName || '?')}`;
-    return `fallback:${String(entry.name || '').trim().toLowerCase()}`;
-}
-
-function normalizeFriendsList(list) {
-    if (!Array.isArray(list)) return [];
-    const seen = new Set();
-    return list
-        .map(friend => ({
-            uid: String(friend?.uid || '').trim(),
-            nickname: String(friend?.nickname || '').trim(),
-            fullName: String(friend?.fullName || '').trim(),
-            photoUrl: String(friend?.photoUrl || '').trim()
-        }))
-        .filter(friend => friend.uid)
-        .filter(friend => {
-            if (seen.has(friend.uid)) return false;
-            seen.add(friend.uid);
-            return true;
-        });
-}
-
-function getCurrentFriends() {
-    return normalizeFriendsList(currentAuthProfile?.friends || []);
-}
-
-function isFriendAuthUid(uid) {
-    return !!uid && getCurrentFriends().some(friend => friend.uid === uid);
-}
-
-function renderFriendsPanel() {
-    const mount = document.getElementById('friends-content');
-    if (!mount) return;
-    if (!currentAuthUser || !firebaseReady) {
-        mount.className = 'details-empty';
-        mount.innerHTML = 'Συνδέσου για να αποθηκεύεις φίλους και να ξεκινάς γρήγορα μονομαχία μαζί τους.';
-        return;
-    }
-    const friends = getCurrentFriends();
-    if (!friends.length) {
-        mount.className = 'details-empty';
-        mount.innerHTML = 'Δεν έχεις προσθέσει φίλους ακόμα.';
-        return;
-    }
-    mount.className = '';
-    mount.innerHTML = friends.map(friend => `
-        <div class="question-review-item">
-            <div class="question-review-text">${friend.nickname || friend.fullName || 'Παίκτης'}</div>
-            <div class="question-review-meta" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-                <button class="secondary" onclick="startFriendDuel('${friend.uid}')">Μονομαχία</button>
-                <button class="secondary" onclick="removeFriend('${friend.uid}')">Αφαίρεση</button>
-            </div>
-        </div>
-    `).join('');
+    resetBtn.classList.toggle('visible', adminUnlocked);
+    unlockBtn.textContent = adminUnlocked ? 'Admin Active' : 'Admin Unlock';
 }
 
 async function fetchMainProfile(uid) {
     if (!firebaseReady || !uid) return null;
     const snap = await firebaseApi.getDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, uid));
-    if (!snap.exists()) return null;
-    const data = snap.data();
-    return {
-        ...data,
-        friends: normalizeFriendsList(data.friends || [])
-    };
+    return snap.exists() ? snap.data() : null;
 }
 
 function deriveProfileFromAuth(userAccount) {
@@ -1859,8 +1772,6 @@ function updateMainAuthUi() {
         mainProfileEditorOpen = false;
         document.getElementById('main-profile-editor')?.classList.add('hidden');
     }
-    updateAdminUi();
-    renderFriendsPanel();
 }
 
 async function handleMainAuthUser(userAccount) {
@@ -2351,8 +2262,6 @@ function sortLeaderboard(entries) {
             primary = (a.name || '').localeCompare(b.name || '', 'el');
         } else if (key === 'score') {
             primary = (a.score || 0) - (b.score || 0);
-        } else if (key === 'games') {
-            primary = (a.games || 0) - (b.games || 0);
         } else if (key === 'accValue') {
             primary = (a.accValue || 0) - (b.accValue || 0);
         } else if (key === 'lastPlayedTs') {
@@ -2366,69 +2275,6 @@ function sortLeaderboard(entries) {
         if ((b.lastPlayedTs || 0) !== (a.lastPlayedTs || 0)) return (b.lastPlayedTs || 0) - (a.lastPlayedTs || 0);
         return (a.name || '').localeCompare(b.name || '', 'el');
     });
-}
-
-function buildPlayerLeaderboard(entries) {
-    const grouped = new Map();
-    entries.forEach(entry => {
-        const key = getEntryPlayerKey(entry);
-        const totalCorrect = Number(entry.total_correct || 0);
-        const totalWrong = Number(entry.total_wrong || 0);
-        const lastPlayedTs = Number(entry.lastPlayedTs || entry.lastPlayed || 0);
-        const existing = grouped.get(key);
-        if (!existing) {
-            grouped.set(key, {
-                ...entry,
-                id: key,
-                playerKey: key,
-                score: Number(entry.score || 0),
-                games: Number(entry.games || 1) || 1,
-                total_correct: totalCorrect,
-                total_wrong: totalWrong,
-                latestAnswers: Array.isArray(entry.answers) ? entry.answers : [],
-                latestCorrect: totalCorrect,
-                latestWrong: totalWrong,
-                latestScore: Number(entry.score || 0),
-                lastPlayed: entry.lastPlayed,
-                lastPlayedTs
-            });
-            return;
-        }
-        existing.score += Number(entry.score || 0);
-        existing.games += Number(entry.games || 1) || 1;
-        existing.total_correct += totalCorrect;
-        existing.total_wrong += totalWrong;
-        if (lastPlayedTs >= existing.lastPlayedTs) {
-            existing.name = entry.name || existing.name;
-            existing.firstName = entry.firstName || existing.firstName;
-            existing.lastName = entry.lastName || existing.lastName;
-            existing.nickname = entry.nickname || existing.nickname;
-            existing.photoUrl = entry.photoUrl || existing.photoUrl;
-            existing.authUid = entry.authUid || existing.authUid;
-            existing.latestAnswers = Array.isArray(entry.answers) ? entry.answers : [];
-            existing.latestCorrect = totalCorrect;
-            existing.latestWrong = totalWrong;
-            existing.latestScore = Number(entry.score || 0);
-            existing.lastPlayed = entry.lastPlayed;
-            existing.lastPlayedTs = lastPlayedTs;
-        }
-    });
-
-    return Array.from(grouped.values()).map(entry => {
-        const totalAnswers = Number(entry.total_correct || 0) + Number(entry.total_wrong || 0);
-        const accValue = totalAnswers ? Math.round((Number(entry.total_correct || 0) / totalAnswers) * 100) : 0;
-        return {
-            ...entry,
-            accValue,
-            acc: `${accValue}%`
-        };
-    });
-}
-
-function renderFriendActionCell(entry) {
-    if (!currentAuthUser || !firebaseReady || !entry.authUid || entry.authUid === currentAuthUser.uid) return '—';
-    const isFriend = isFriendAuthUid(entry.authUid);
-    return `<button class="secondary" onclick="event.stopPropagation(); toggleFriend('${entry.id}')">${isFriend ? 'Αφαίρεση' : 'Φίλος +'}</button>`;
 }
 
 function changeSort(key) {
@@ -2734,31 +2580,27 @@ async function deleteRemoteEntry(entryId) {
 function renderLeaderboardEntries(entries, targetId = user.id) {
     const medals = ['🥇', '🥈', '🥉'];
     const previewRows = entries.slice(0, Math.min(entries.length, 10));
-    leaderboardEntriesCache = entries;
 
     document.getElementById('lb-body').innerHTML = previewRows.length ? previewRows.map((p, i) => `
         <tr class="${p.id === targetId ? 'highlight' : ''}">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
             <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
-            <td>${p.games}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
-        </tr>`).join('') : '<tr><td colspan="6">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
+        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
 
     document.getElementById('leaderboard-full-body').innerHTML = entries.length ? entries.map((p, i) => `
         <tr class="entry-row ${p.id === targetId ? 'highlight' : ''}" onclick="showEntryDetails('${p.id}')">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
             <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
-            <td>${p.games}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
-            <td>${renderFriendActionCell(p)}</td>
             <td class="delete-cell">
-                <button class="delete-entry-btn ${(adminUnlocked && isAdminUser()) ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
+                <button class="delete-entry-btn ${adminUnlocked ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
             </td>
-        </tr>`).join('') : '<tr><td colspan="8">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
+        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
 
     if (!selectedEntryId && entries.length) {
         selectedEntryId = targetId && entries.some(entry => entry.id === targetId) ? targetId : entries[0].id;
@@ -2768,7 +2610,6 @@ function renderLeaderboardEntries(entries, targetId = user.id) {
 
     renderDetailsPanel(entries.find(entry => entry.id === selectedEntryId) || null);
     updateAdminUi();
-    renderFriendsPanel();
 
     return entries;
 }
@@ -2779,20 +2620,20 @@ function renderDetailsPanel(entry) {
 
     if (!entry) {
         detailsContent.className = 'details-empty';
-        detailsContent.innerHTML = 'Πάτησε έναν παίκτη από τον πίνακα για να δεις το συνολικό του προφίλ και το τελευταίο παιχνίδι του.';
+        detailsContent.innerHTML = 'Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.';
         return;
     }
 
-    const answers = Array.isArray(entry.latestAnswers || entry.answers) ? (entry.latestAnswers || entry.answers) : [];
+    const answers = Array.isArray(entry.answers) ? entry.answers : [];
     const correctAnswers = answers.filter(answer => answer.isCorrect).length;
-    const totalQuestions = answers.length || (Number(entry.latestCorrect || 0) + Number(entry.latestWrong || 0));
+    const totalQuestions = answers.length || (Number(entry.total_correct || 0) + Number(entry.total_wrong || 0));
     const entryDisplayName = getPreferredDisplayName(entry);
     detailsContent.className = '';
     detailsContent.innerHTML = `
         <div class="question-review-meta">
             <strong>${entryDisplayName}</strong><br>
-            Total Score: ${entry.score} | Games: ${entry.games} | Accuracy: ${entry.acc}<br>
-            Τελευταίο Παιχνίδι: ${correctAnswers}/${totalQuestions} σωστές | Last Played: ${formatDate(entry.lastPlayed)}
+            Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${totalQuestions}<br>
+            Played: ${formatDate(entry.lastPlayed)}
         </div>
         <div class="question-review">
             ${answers.length ? answers.map((answer, index) => `
@@ -2815,17 +2656,6 @@ function showEntryDetails(entryId) {
 }
 
 function unlockAdmin() {
-    if (!isAdminUser()) {
-        alert('Η διαχείριση εμφανίζεται μόνο στο admin προφίλ.');
-        return;
-    }
-    if (adminUnlocked) {
-        adminUnlocked = false;
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-        updateAdminUi();
-        alert('Admin κλειδώθηκε.');
-        return;
-    }
     const username = prompt('Admin username:');
     if (username === null) return;
     const password = prompt('Admin password:');
@@ -2833,7 +2663,7 @@ function unlockAdmin() {
 
     if (username === ADMIN_CONFIG.username && password === ADMIN_CONFIG.password) {
         adminUnlocked = true;
-        sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+        sessionStorage.setItem('quiz11_admin_unlocked', 'true');
         updateAdminUi();
         alert('Admin ενεργοποιήθηκε.');
         return;
@@ -2844,10 +2674,10 @@ function unlockAdmin() {
 
 async function renderLeaderboard(targetId = user.id) {
     if (firebaseReady) {
-        const remoteEntries = buildPlayerLeaderboard(normalizeRemoteEntries(await fetchRemoteLeaderboard()));
+        const remoteEntries = normalizeRemoteEntries(await fetchRemoteLeaderboard());
         return renderLeaderboardEntries(sortLeaderboard(remoteEntries), targetId);
     }
-    return renderLeaderboardEntries(sortLeaderboard(buildPlayerLeaderboard(getLeaderboard())), targetId);
+    return renderLeaderboardEntries(sortLeaderboard(getLeaderboard()), targetId);
 }
 
 function resetQuizState(mode = currentQuizMode) {
@@ -2996,7 +2826,7 @@ function restartQuiz() {
 }
 
 async function clearLeaderboard() {
-    if (!adminUnlocked || !isAdminUser()) {
+    if (!adminUnlocked) {
         alert('Μόνο ο διαχειριστής μπορεί να κάνει εκκαθάριση leaderboard.');
         return;
     }
@@ -3014,73 +2844,24 @@ async function clearLeaderboard() {
 }
 
 async function deleteLeaderboardEntry(entryId) {
-    if (!adminUnlocked || !isAdminUser()) {
+    if (!adminUnlocked) {
         alert('Μόνο ο διαχειριστής μπορεί να διαγράψει εγγραφές.');
         return;
     }
     if (!confirm('Θέλεις να διαγραφεί αυτή η συμμετοχή;')) return;
 
     if (firebaseReady) {
-        const allEntries = normalizeRemoteEntries(await fetchRemoteLeaderboard());
-        const matchingEntries = allEntries.filter(entry => getEntryPlayerKey(entry) === entryId);
-        await Promise.all(matchingEntries.map(entry => deleteRemoteEntry(entry.id)));
+        await deleteRemoteEntry(entryId);
         if (selectedEntryId === entryId) selectedEntryId = null;
         await renderLeaderboard();
         return;
     }
 
-    const filtered = getLeaderboard().filter(entry => getEntryPlayerKey(entry) !== entryId);
+    const filtered = getLeaderboard().filter(entry => entry.id !== entryId);
     saveLeaderboard(filtered);
     if (selectedEntryId === entryId) selectedEntryId = null;
-    renderLeaderboardEntries(sortLeaderboard(buildPlayerLeaderboard(filtered)), user.id);
+    renderLeaderboardEntries(sortLeaderboard(filtered), user.id);
 }
-
-window.toggleFriend = async function toggleFriend(entryId) {
-    if (!firebaseReady || !currentAuthUser) {
-        alert('Συνδέσου για να προσθέτεις φίλους.');
-        return;
-    }
-    const target = leaderboardEntriesCache.find(entry => entry.id === entryId);
-    if (!target || !target.authUid || target.authUid === currentAuthUser.uid) return;
-    const friends = getCurrentFriends();
-    const exists = friends.some(friend => friend.uid === target.authUid);
-    const nextFriends = exists
-        ? friends.filter(friend => friend.uid !== target.authUid)
-        : [...friends, {
-            uid: target.authUid,
-            nickname: target.nickname || '',
-            fullName: target.name || `${target.firstName || ''} ${target.lastName || ''}`.trim(),
-            photoUrl: target.photoUrl || ''
-        }];
-    currentAuthProfile = { ...(currentAuthProfile || {}), friends: nextFriends };
-    await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), {
-        friends: nextFriends,
-        updatedAt: new Date().toISOString()
-    }, { merge: true });
-    renderFriendsPanel();
-    renderLeaderboardEntries(leaderboardEntriesCache, selectedEntryId || user.id);
-};
-
-window.removeFriend = async function removeFriend(uid) {
-    if (!firebaseReady || !currentAuthUser) return;
-    const nextFriends = getCurrentFriends().filter(friend => friend.uid !== uid);
-    currentAuthProfile = { ...(currentAuthProfile || {}), friends: nextFriends };
-    await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), {
-        friends: nextFriends,
-        updatedAt: new Date().toISOString()
-    }, { merge: true });
-    renderFriendsPanel();
-    renderLeaderboardEntries(leaderboardEntriesCache, selectedEntryId || user.id);
-};
-
-window.startFriendDuel = function startFriendDuel(uid) {
-    const friend = getCurrentFriends().find(item => item.uid === uid);
-    if (!friend) return;
-    try {
-        localStorage.setItem('quiz12_duel_friend_target', JSON.stringify(friend));
-    } catch {}
-    window.location.href = DUEL_MODE_URL;
-};
 
 function loadQuestion() {
     clearInterval(timer);
@@ -3345,23 +3126,18 @@ async function endQuiz() {
             answers
         });
 
-        saveLeaderboard(lb);
-        sorted = sortLeaderboard(buildPlayerLeaderboard(lb));
-        selectedEntryId = getEntryPlayerKey({
-            authUid: user.authUid || '',
-            firstName: user.f,
-            lastName: user.l
-        });
-        renderLeaderboardEntries(sorted, selectedEntryId);
+        sorted = sortLeaderboard(lb);
+        saveLeaderboard(sorted);
+        selectedEntryId = attemptId;
+        renderLeaderboardEntries(sorted, attemptId);
     }
 
     if (firebaseReady) {
-        const targetPlayerKey = getEntryPlayerKey({
-            authUid: currentAuthUser?.uid || '',
-            firstName: user.f,
-            lastName: user.l
-        });
-        const matchedEntry = sorted.find(item => item.id === targetPlayerKey);
+        const matchedEntry = sorted.find(item =>
+            item.name === `${user.f} ${user.l}` &&
+            item.score === score &&
+            item.lastPlayedTs && Math.abs(item.lastPlayedTs - lastPlayed) < 10000
+        );
         selectedEntryId = matchedEntry ? matchedEntry.id : (sorted[0]?.id || null);
     }
 
