@@ -1,5 +1,5 @@
 {
-  "generalOffset": 10,
+  "generalOffset": 30,
   "assetImageSignature": "animals/Octopus.webp|animals/elephant.jpg|animals/elephant.svg|animals/giraffe.jpg|animals/giraffe.svg|animals/lion.jpg|animals/lion.svg|animals/octopus.svg|animals/owl.jpg|animals/owl.svg|animals/panda.jpg|animals/panda.svg|animals/penguin.jpeg|animals/penguin.svg|animals/shark.jpg|animals/shark.svg|cartoons/Pikachu.png|cartoons/Sonic.webp|cartoons/mouse-ears.jpg|cartoons/mouse-ears.svg|cartoons/ogre-ears.webp|cartoons/sponge.webp|flags/Flag-Greece.webp|flags/Flag_of_Germany.svg.webp|flags/Flag_of_Japan.svg.png|flags/brazil.svg|flags/brazilian-flag-waving-stockcake.webp|flags/download.jpg|flags/france.svg|flags/germany.svg|flags/greece.svg|flags/italy-flag-wallpaper_1024x1024.jpg|flags/italy.svg|flags/japan.svg|heroes/Captain_America_Shield.jpg|heroes/bat-emblem.jpg|heroes/black-panther.jpg|heroes/captain-marvel.jpg|heroes/deadpool.jpg|heroes/doctor-fate.jpg|heroes/doctor-manhattan.jpg|heroes/doctor-strange.jpg|heroes/hammer-icon.jpg|heroes/jean-grey.jpg|heroes/lantern-ring.jpg|heroes/shield-star.svg|heroes/spider-emblem.jpg|heroes/thanos.jpg|heroes/wonder-woman.jpg|landmarks/taj-mahal.jpg|logos/apple-bite.png|logos/arches.png|logos/arches.svg|logos/instagram-camera.svg|logos/mercedes-star.png|logos/netflix-n.svg|logos/pepsi-circle.webp|logos/play-button.svg|logos/rings.svg|logos/starbucks-cup.png|logos/swoosh.webp|maps/argentina-map.png|maps/argentina-map.svg|maps/australia-map.jpg|maps/australia-map.svg|maps/brazil-map.jpg|maps/brazil-map.svg|maps/india-map.svg|maps/india-map.webp|maps/italy-map.svg|maps/japan-map.svg|maps/madagascar-map.png|maps/madagascar-map.svg|maps/norway-map.svg|maps/south-africa-map.svg|maps/uk-map.svg|maps/uk-map.webp",
   "processedImageAssets": [
     "animals/Octopus.webp",
@@ -80,5 +80,5 @@
     "maps/uk-map.svg",
     "maps/uk-map.webp"
   ],
-  "lastGeneratedAt": "2026-04-11T08:36:40.308Z"
+  "lastGeneratedAt": "2026-04-11T09:35:27.224Z"
 }
